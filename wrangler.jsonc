@@ -13,7 +13,7 @@
     {
       "binding": "DB",
       "database_name": "may-mac-store",
-      "database_id": "00000000-0000-0000-0000-000000000001",
+      "database_id": "cd56d357-bfc3-4fe1-b897-87d8e52fd62c",
       "migrations_dir": "migrations"
     }
   ]

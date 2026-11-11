@@ -37,14 +37,13 @@ npm run build
 
 ## Deploy lên Cloudflare
 
-1. Tạo database D1 và đăng nhập Wrangler:
+1. Database D1 `may-mac-store` đã được tạo cho project này. Đăng nhập Wrangler nếu chưa đăng nhập:
 
    ```bash
    npx wrangler login
-   npx wrangler d1 create may-mac-store
    ```
 
-2. Thay `database_id` mẫu trong `wrangler.jsonc` bằng ID Cloudflare vừa trả về. Không commit thông tin bí mật.
+2. `wrangler.jsonc` đã trỏ đến database riêng của project. Nếu deploy sang tài khoản Cloudflare khác, tạo D1 riêng và thay `database_id`; không dùng database của dự án khác.
 3. Áp dụng schema và dữ liệu sản phẩm khởi tạo:
 
    ```bash
@@ -77,7 +76,7 @@ Sau khi deploy, mở `/admin/setup` để tạo tài khoản quản trị đầu
 
 ## Cấu hình và giới hạn cần hoàn tất trước bán hàng thật
 
-- Mã `database_id` trong `wrangler.jsonc` đang là giá trị mẫu, cần thay bằng D1 database của chủ cửa hàng trước khi deploy.
+- Database D1 đã được tạo nhưng cần xác nhận cấu hình email và mã quản trị trước khi mở các luồng đăng ký và quản trị cho khách thật.
 - COD và chuyển khoản là các phương thức thanh toán hiện được xử lý. VNPay/MoMo chưa bật; cần tài khoản merchant, khóa ký và cấu hình callback/webhook riêng trước khi nhận thanh toán trực tuyến.
 - Chatbot chỉ hoạt động sau khi cấu hình khóa và model AI. Email xác minh/đặt lại mật khẩu dùng Resend; cần cấu hình `RESEND_API_KEY`, `MAIL_FROM` và `APP_ORIGIN`. Local dev trả link kiểm thử ngay trong phản hồi API.
 - Chưa có tích hợp hãng vận chuyển, hóa đơn điện tử, chính sách trả hàng theo từng trường hợp hay đồng bộ tồn kho từ POS.
