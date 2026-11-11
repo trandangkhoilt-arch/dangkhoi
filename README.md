@@ -4,6 +4,7 @@ Website cửa hàng thời trang tiếng Việt, được tạo mới độc l�
 
 **Bản xem trước đang chạy:** https://may-mac-fashion.trandangkhoi-lt.workers.dev
 Đây chưa phải cấu hình bán hàng hoàn chỉnh: cần đặt `ADMIN_SETUP_KEY`, cấu hình Resend để xác minh email, và nhập thông tin cửa hàng trước khi mở các luồng tài khoản cho khách.
+Chatbot trên bản Cloudflare đã dùng Workers AI model `@cf/meta/llama-3.1-8b-instruct-fp8`; Ollama vẫn là lựa chọn mặc định cho phát triển local.
 
 ## Công nghệ
 
@@ -61,7 +62,7 @@ npm run build
    npx wrangler secret put ADMIN_SETUP_KEY
    ```
 
-   Có thể cấu hình thêm `AI_PROVIDER`, `AI_API_KEY`, `AI_MODEL`, `AI_BASE_URL`, `BANK_NAME`, `BANK_ACCOUNT`, `BANK_HOLDER`. Không đặt các khóa bí mật trong mã frontend hoặc commit vào Git.
+   Production đã cấu hình binding Cloudflare Workers AI với model `@cf/meta/llama-3.1-8b-instruct-fp8`; không cần API key Ollama/OpenAI. Có thể cấu hình thêm `BANK_NAME`, `BANK_ACCOUNT`, `BANK_HOLDER`. Workers AI tính usage theo tài khoản Cloudflare; kiểm tra giới hạn và giá hiện hành trong Cloudflare Dashboard.
 5. Deploy:
 
    ```bash
@@ -77,13 +78,13 @@ Sau khi deploy, mở `/admin/setup` để tạo tài khoản quản trị đầu
 - Đặt hàng COD hoặc chuyển khoản nếu cửa hàng đã cấu hình thông tin ngân hàng. Mã ưu đãi khởi tạo: `MAYMOI10`.
 - Đăng ký có xác minh email, đăng nhập, đặt lại mật khẩu, session phía server, lịch sử và tra cứu đơn hàng.
 - Quản trị sản phẩm, ẩn/hiện catalog, cập nhật trạng thái đơn; hủy đơn trước khi giao sẽ hoàn tồn kho bằng trigger D1.
-- Đăng ký nhận tin, đánh giá sau khi nhận hàng và chatbot tư vấn dựa trên catalog, tồn kho, đánh giá, mã giảm giá và thông tin cửa hàng qua Ollama hoặc API tương thích OpenAI.
+- Đăng ký nhận tin, đánh giá sau khi nhận hàng và chatbot tư vấn dựa trên catalog, tồn kho, đánh giá, mã giảm giá và thông tin cửa hàng qua Cloudflare Workers AI trên production hoặc Ollama local khi phát triển.
 
 ## Cấu hình và giới hạn cần hoàn tất trước bán hàng thật
 
 - Database D1 đã được tạo nhưng cần xác nhận cấu hình email và mã quản trị trước khi mở các luồng đăng ký và quản trị cho khách thật.
 - COD và chuyển khoản là các phương thức thanh toán hiện được xử lý. VNPay/MoMo chưa bật; cần tài khoản merchant, khóa ký và cấu hình callback/webhook riêng trước khi nhận thanh toán trực tuyến.
-- Ollama local chỉ phục vụ khi phát triển trên máy đang chạy Ollama. Worker Cloudflare không thể truy cập `127.0.0.1` trên máy của chủ shop; để chatbot hoạt động trên website đã deploy, cần một endpoint Ollama HTTPS có thể truy cập an toàn từ Cloudflare, sau đó cấu hình `AI_PROVIDER=ollama`, `AI_MODEL`, `AI_BASE_URL`, `AI_API_KEY` (nếu endpoint yêu cầu xác thực) trên Cloudflare. Không mở Ollama trực tiếp ra Internet nếu chưa có lớp xác thực và giới hạn truy cập.
+- Ollama local chỉ dùng trong phát triển; Worker production dùng binding Cloudflare Workers AI, không gọi Ollama cục bộ.
 - Email xác minh/đặt lại mật khẩu dùng Resend; cần cấu hình `RESEND_API_KEY`, `MAIL_FROM` và `APP_ORIGIN`. Local dev trả link kiểm thử ngay trong phản hồi API.
 - Chưa có tích hợp hãng vận chuyển, hóa đơn điện tử, chính sách trả hàng theo từng trường hợp hay đồng bộ tồn kho từ POS.
 - Hình ảnh sản phẩm hiện tải từ Unsplash; thay bằng ảnh sản phẩm có bản quyền cửa hàng hoặc object storage trước khi mở bán.
