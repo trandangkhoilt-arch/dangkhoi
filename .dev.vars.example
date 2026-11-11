@@ -1,0 +1,10 @@
+ADMIN_SETUP_KEY=replace-with-a-long-random-secret
+AI_API_KEY=
+AI_MODEL=
+AI_BASE_URL=https://api.openai.com/v1
+BANK_NAME=
+BANK_ACCOUNT=
+BANK_HOLDER=
+APP_ORIGIN=http://localhost:5173
+MAIL_FROM=
+RESEND_API_KEY=
