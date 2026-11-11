@@ -25,11 +25,13 @@ cp .dev.vars.example .dev.vars
 Đổi `ADMIN_SETUP_KEY` trong `.dev.vars` thành chuỗi bí mật ngẫu nhiên của riêng bạn, rồi khởi tạo D1 local:
 
 ```bash
+ollama pull qwen2.5:3b
 npm run db:local
 npm run dev
 ```
 
 Mở `http://localhost:5173`. Vite chuyển `/api` đến Worker local ở cổng `8787`. Tạo quản trị viên đầu tiên tại `/admin/setup`; endpoint này chỉ hoạt động một lần và cần đúng `ADMIN_SETUP_KEY`.
+Chatbot local mặc định dùng Ollama tại `http://127.0.0.1:11434`, model `qwen2.5:3b`; bảo đảm Ollama đang chạy và có model đã tải. Có thể đổi `AI_MODEL`, `AI_BASE_URL` hoặc `AI_PROVIDER` trong `.dev.vars`. Chatbot nhận catalog, giá, tồn kho theo màu/size, đánh giá, mã ưu đãi đang hoạt động và thông tin cửa hàng từ Worker/D1 cho mỗi lượt hỏi.
 
 Các lệnh kiểm tra:
 
@@ -59,7 +61,7 @@ npm run build
    npx wrangler secret put ADMIN_SETUP_KEY
    ```
 
-   Có thể cấu hình thêm `AI_API_KEY`, `AI_MODEL`, `AI_BASE_URL`, `BANK_NAME`, `BANK_ACCOUNT`, `BANK_HOLDER`. Không đặt các khóa bí mật trong mã frontend hoặc commit vào Git.
+   Có thể cấu hình thêm `AI_PROVIDER`, `AI_API_KEY`, `AI_MODEL`, `AI_BASE_URL`, `BANK_NAME`, `BANK_ACCOUNT`, `BANK_HOLDER`. Không đặt các khóa bí mật trong mã frontend hoặc commit vào Git.
 5. Deploy:
 
    ```bash
@@ -75,13 +77,14 @@ Sau khi deploy, mở `/admin/setup` để tạo tài khoản quản trị đầu
 - Đặt hàng COD hoặc chuyển khoản nếu cửa hàng đã cấu hình thông tin ngân hàng. Mã ưu đãi khởi tạo: `MAYMOI10`.
 - Đăng ký có xác minh email, đăng nhập, đặt lại mật khẩu, session phía server, lịch sử và tra cứu đơn hàng.
 - Quản trị sản phẩm, ẩn/hiện catalog, cập nhật trạng thái đơn; hủy đơn trước khi giao sẽ hoàn tồn kho bằng trigger D1.
-- Đăng ký nhận tin, đánh giá sau khi nhận hàng và chatbot tư vấn nếu cấu hình nhà cung cấp AI.
+- Đăng ký nhận tin, đánh giá sau khi nhận hàng và chatbot tư vấn dựa trên catalog, tồn kho, đánh giá, mã giảm giá và thông tin cửa hàng qua Ollama hoặc API tương thích OpenAI.
 
 ## Cấu hình và giới hạn cần hoàn tất trước bán hàng thật
 
 - Database D1 đã được tạo nhưng cần xác nhận cấu hình email và mã quản trị trước khi mở các luồng đăng ký và quản trị cho khách thật.
 - COD và chuyển khoản là các phương thức thanh toán hiện được xử lý. VNPay/MoMo chưa bật; cần tài khoản merchant, khóa ký và cấu hình callback/webhook riêng trước khi nhận thanh toán trực tuyến.
-- Chatbot chỉ hoạt động sau khi cấu hình khóa và model AI. Email xác minh/đặt lại mật khẩu dùng Resend; cần cấu hình `RESEND_API_KEY`, `MAIL_FROM` và `APP_ORIGIN`. Local dev trả link kiểm thử ngay trong phản hồi API.
+- Ollama local chỉ phục vụ khi phát triển trên máy đang chạy Ollama. Worker Cloudflare không thể truy cập `127.0.0.1` trên máy của chủ shop; để chatbot hoạt động trên website đã deploy, cần một endpoint Ollama HTTPS có thể truy cập an toàn từ Cloudflare, sau đó cấu hình `AI_PROVIDER=ollama`, `AI_MODEL`, `AI_BASE_URL`, `AI_API_KEY` (nếu endpoint yêu cầu xác thực) trên Cloudflare. Không mở Ollama trực tiếp ra Internet nếu chưa có lớp xác thực và giới hạn truy cập.
+- Email xác minh/đặt lại mật khẩu dùng Resend; cần cấu hình `RESEND_API_KEY`, `MAIL_FROM` và `APP_ORIGIN`. Local dev trả link kiểm thử ngay trong phản hồi API.
 - Chưa có tích hợp hãng vận chuyển, hóa đơn điện tử, chính sách trả hàng theo từng trường hợp hay đồng bộ tồn kho từ POS.
 - Hình ảnh sản phẩm hiện tải từ Unsplash; thay bằng ảnh sản phẩm có bản quyền cửa hàng hoặc object storage trước khi mở bán.
 - Catalog SQL là dữ liệu khởi tạo mới để demo; hãy rà soát sản phẩm, chất liệu, giá, tồn kho, thông tin pháp lý và nội dung chính sách trước khi nhận khách.

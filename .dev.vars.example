@@ -1,7 +1,8 @@
 ADMIN_SETUP_KEY=replace-with-a-long-random-secret
+AI_PROVIDER=ollama
 AI_API_KEY=
-AI_MODEL=
-AI_BASE_URL=https://api.openai.com/v1
+AI_MODEL=qwen2.5:3b
+AI_BASE_URL=http://127.0.0.1:11434
 BANK_NAME=
 BANK_ACCOUNT=
 BANK_HOLDER=
