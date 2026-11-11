@@ -2,6 +2,9 @@
 
 Website cửa hàng thời trang tiếng Việt, được tạo mới độc lập. Project này không nhập dữ liệu, tài khoản, giỏ hàng hay cấu hình từ website cũ.
 
+**Bản xem trước đang chạy:** https://may-mac-fashion.trandangkhoi-lt.workers.dev
+Đây chưa phải cấu hình bán hàng hoàn chỉnh: cần đặt `ADMIN_SETUP_KEY`, cấu hình Resend để xác minh email, và nhập thông tin cửa hàng trước khi mở các luồng tài khoản cho khách.
+
 ## Công nghệ
 
 - React 19, TypeScript, Vite và React Router.
